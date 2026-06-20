@@ -1,0 +1,18 @@
+services:
+  postgres:
+    image: postgres:17
+    container_name: incident-postgres
+
+    environment:
+      POSTGRES_DB: incidentdb
+      POSTGRES_USER: incident
+      POSTGRES_PASSWORD: incident
+
+    ports:
+      - "5432:5432"
+
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
