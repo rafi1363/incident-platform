@@ -4,15 +4,26 @@ services:
     container_name: incident-postgres
 
     environment:
-      POSTGRES_DB: incidentdb
-      POSTGRES_USER: incident
-      POSTGRES_PASSWORD: incident
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
 
     ports:
       - "5432:5432"
 
     volumes:
       - postgres_data:/var/lib/postgresql/data
+
+  backend:
+    build:
+      context: ./backend
+    container_name: incident-backend
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+    depends_on:
+      - postgres
 
 volumes:
   postgres_data:

@@ -3,7 +3,7 @@ package models
 import "time"
 
 type Service struct {
-	ID        int       `jsonn:"id"`
+	ID        int       `json:"id"`
 	Name      string    `json:"name"`
 	URL       string    `json:"url"`
 	Status    string    `json:"status"`

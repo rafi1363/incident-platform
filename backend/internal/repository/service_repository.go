@@ -55,5 +55,9 @@ func (r *ServiceRepository) GetAll(ctx context.Context) ([]models.Service, error
 		}
 		services = append(services, s)
 	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
 	return services, nil
 }
