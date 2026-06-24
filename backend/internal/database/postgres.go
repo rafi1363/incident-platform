@@ -20,11 +20,11 @@ func mustEnv(key string) string {
 func NewPostgresPool() (*pgxpool.Pool, error) {
 	dsn := fmt.Sprintf(
 		"postgres://%s:%s@%s:%s/%s",
-		os.Getenv("DB_USER"),
-		os.Getenv("DB_PASSWORD"),
-		os.Getenv("DB_HOST"),
-		os.Getenv("DB_PORT"),
-		os.Getenv("DB_NAME"),
+		mustEnv("DB_USER"),
+		mustEnv("DB_PASSWORD"),
+		mustEnv("DB_HOST"),
+		mustEnv("DB_PORT"),
+		mustEnv("DB_NAME"),
 	)
 
 	pool, err := pgxpool.New(context.Background(), dsn)

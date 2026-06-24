@@ -1,0 +1,38 @@
+# === Secrets ===
+# NEVER commit real environment files. Only .env.example is tracked.
+.env
+.env.local
+.env.*.local
+
+# === Go ===
+backend/api
+backend/api.exe
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+vendor/
+
+# === Node / Frontend (for future Phase 3) ===
+node_modules/
+dist/
+build/
+.next/
+.cache/
+
+# === OS junk ===
+.DS_Store
+Thumbs.db
+
+# === Editor ===
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# === Docker ===
+# Local dev volumes (if any bind-mounted data appears)
+postgres_data/

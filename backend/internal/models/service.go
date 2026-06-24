@@ -10,3 +10,14 @@ type Service struct {
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 }
+
+type CreateServiceInput struct {
+	Name string `json:"name" binding:"required"`
+	URL  string `json:"url" binding:"required"`
+}
+
+type UpdateServiceInput struct {
+	Name   *string `json:"name"`
+	URL    *string `jsong:"url"`
+	Status *string `json:"status"`
+}

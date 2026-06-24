@@ -14,6 +14,31 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  migrate:
+    image: migrate/migrate
+    container_name: incident-migrate
+
+    volumes:
+      - ./database/migrations:/migrations
+
+    command:
+      [
+        "-path",
+        "/migrations",
+        "-database",
+        "postgres://incident:${DB_PASSWORD}@postgres:5432/${DB_NAME}?sslmode=disable",
+        "up",
+      ]
+    depends_on:
+      postgres:
+        condition: service_healthy
+
   backend:
     build:
       context: ./backend
@@ -23,7 +48,8 @@ services:
     env_file:
       - .env
     depends_on:
-      - postgres
+      migrate:
+        condition: service_completed_successfully
 
 volumes:
   postgres_data:
