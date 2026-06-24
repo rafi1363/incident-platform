@@ -1,0 +1,42 @@
+# GitHub Actions is "event-driven YAML."
+# This file IS your CI/CD pipeline. GitHub reads it and runs it automatically.
+
+name: CI
+
+# ─── EVENT: what triggers the pipeline ───────────────────────────────
+# "On any push to main, OR any pull request touching main, run this."
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+# ─── JOBS: groups of steps. Each job runs on a FRESH disposable VM. ──
+jobs:
+  build:
+    runs-on: ubuntu-latest   # GitHub gives us a blank Ubuntu VM
+
+    steps:
+      # Step 1: get our code onto the runner. Without this, the VM is empty.
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Step 2: install Go. `uses:` runs a pre-made action (someone else's code).
+      # `with:` passes config to it. Go sub-version is auto-picked from go.mod.
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: backend/go.mod
+          cache: true
+
+      # Step 3: vet = Go's built-in linter. Catches suspicious code (printf
+      # mistakes, unreachable code, struct tag errors). Free static analysis.
+      - name: Lint (go vet)
+        working-directory: backend
+        run: go vet ./...
+
+      # Step 4: build. If the code doesn't compile, the pipeline FAILS here
+      # and the push is rejected (well, marked red). Stops bad code reaching main.
+      - name: Build
+        working-directory: backend
+        run: go build ./...
