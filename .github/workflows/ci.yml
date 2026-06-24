@@ -1,42 +1,79 @@
-# GitHub Actions is "event-driven YAML."
-# This file IS your CI/CD pipeline. GitHub reads it and runs it automatically.
-
 name: CI
 
-# ─── EVENT: what triggers the pipeline ───────────────────────────────
-# "On any push to main, OR any pull request touching main, run this."
 on:
   push:
     branches: [main]
   pull_request:
     branches: [main]
 
-# ─── JOBS: groups of steps. Each job runs on a FRESH disposable VM. ──
+# ─── PERMISSIONS ─────────────────────────────────────────────────────
+# Least-privilege: by default GITHUB_TOKEN can only READ.
+# We add `packages: write` so the workflow can push the image to GHCR.
+permissions:
+  contents: read
+  packages: write
+
+env:
+  # Define the image name once; reuse it with ${{ ... }} everywhere.
+  IMAGE_NAME: ghcr.io/${{ github.repository_owner }}/incident-backend
+
 jobs:
   build:
-    runs-on: ubuntu-latest   # GitHub gives us a blank Ubuntu VM
+    runs-on: ubuntu-latest
 
     steps:
-      # Step 1: get our code onto the runner. Without this, the VM is empty.
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # Step 2: install Go. `uses:` runs a pre-made action (someone else's code).
-      # `with:` passes config to it. Go sub-version is auto-picked from go.mod.
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
           go-version-file: backend/go.mod
           cache: true
 
-      # Step 3: vet = Go's built-in linter. Catches suspicious code (printf
-      # mistakes, unreachable code, struct tag errors). Free static analysis.
       - name: Lint (go vet)
         working-directory: backend
         run: go vet ./...
 
-      # Step 4: build. If the code doesn't compile, the pipeline FAILS here
-      # and the push is rejected (well, marked red). Stops bad code reaching main.
       - name: Build
         working-directory: backend
         run: go build ./...
+
+  # ─── CD: build + push Docker image to GHCR ─────────────────────────
+  # Separate job from `build` because:
+  #   - `needs: build` means "don't ship unless the Go build passed"
+  #   - `if:` restricts shipping to pushes on main (PRs get tested, not shipped)
+  #   - This is the literal CI-vs-CD split: test everywhere, ship only on main.
+  push-image:
+    needs: build
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Log in to GHCR with the auto-injected GITHUB_TOKEN.
+      # NO secret to create — GitHub provides this to every workflow run.
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # Two tags every build:
+      #   :latest       — the current version (overwritten each push)
+      #   :sha-<commit> — a unique, permanent fingerprint (for rollbacks)
+      - name: Generate image tags
+        id: meta
+        run: |
+          SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)
+          echo "tags=$IMAGE_NAME:latest,$IMAGE_NAME:sha-$SHORT_SHA" >> $GITHUB_OUTPUT
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./backend
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
