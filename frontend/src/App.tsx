@@ -1,121 +1,53 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+// App.tsx — the root component of your dashboard.
+// Everything visible on the page starts here.
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
+    // The outermost div sets up a full-height flex column.
+    // min-h-screen = "at least as tall as the viewport"
+    // bg-background text-foreground = "use my dark theme colors"
+    <div className="min-h-screen bg-background text-foreground flex flex-col">
+      {/* ─── TOP BAR ─────────────────────────────────────────── */}
+      {/* border-b = bottom border. Uses --border token (subtle white line). */}
+      <header className="border-b border-border">
+        {/* max-w-7xl mx-auto = "center this, max 1280px wide" */}
+        {/* px-6 py-4 = horizontal & vertical padding */}
+        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            {/* font-mono inherited from index.css (JetBrains Mono). */}
+            <span className="text-lg font-semibold tracking-tight">
+              Incident Platform
+            </span>
+          </div>
+          {/* text-muted-foreground = dimmer text (the --muted-foreground token). */}
+          <span className="text-sm text-muted-foreground">
+            Monitor your services
+          </span>
         </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+      </header>
 
-      <div className="ticks"></div>
+      {/* ─── MAIN CONTENT AREA ───────────────────────────────── */}
+      {/* flex-1 = "grow to fill remaining vertical space" */}
+      <main className="flex-1 max-w-7xl mx-auto w-full px-6 py-8">
+        <h1 className="text-2xl font-semibold mb-6">Dashboard</h1>
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
+        {/* Placeholder grid — we'll build real components next. */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="border border-border rounded-lg p-6">
+            <p className="text-sm text-muted-foreground">Total Services</p>
+            <p className="text-3xl font-semibold mt-2">—</p>
+          </div>
+          <div className="border border-border rounded-lg p-6">
+            <p className="text-sm text-muted-foreground">Healthy</p>
+            <p className="text-3xl font-semibold mt-2 text-emerald-500">—</p>
+          </div>
+          <div className="border border-border rounded-lg p-6">
+            <p className="text-sm text-muted-foreground">Open Incidents</p>
+            <p className="text-3xl font-semibold mt-2 text-red-500">—</p>
+          </div>
         </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
+      </main>
+    </div>
   )
 }
 
